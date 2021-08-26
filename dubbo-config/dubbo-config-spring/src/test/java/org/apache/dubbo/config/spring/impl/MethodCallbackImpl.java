@@ -17,18 +17,25 @@
 package org.apache.dubbo.config.spring.impl;
 
 import org.apache.dubbo.config.spring.api.MethodCallback;
+import org.apache.dubbo.rpc.RpcContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.annotation.PostConstruct;
 
 public class MethodCallbackImpl implements MethodCallback {
-    private String onInvoke;
-    private String onReturn;
-    private String onThrow;
+    private String onInvoke1;
+    private String onReturn1;
+    private String onThrow1;
+    
+    private String onInvoke2;
+    private String onReturn2;
+    private String onThrow2;
 
     @Autowired
     private Environment environment;
@@ -36,6 +43,10 @@ public class MethodCallbackImpl implements MethodCallback {
     @Autowired
     private ApplicationContext context;
 
+    public static AtomicInteger cnt = new AtomicInteger();
+    private AtomicInteger cnt1 = new AtomicInteger();
+    private AtomicInteger cnt2 = new AtomicInteger();
+    
     @PostConstruct
     protected void init() {
         checkInjection();
@@ -47,9 +58,23 @@ public class MethodCallbackImpl implements MethodCallback {
         try {
             checkInjection();
             checkTranscation();
-            this.onInvoke = "dubbo invoke success";
+            switch (RpcContext.getContext().getConsumerUrl().getParameter("refId")) {
+            case "ref-1":
+                this.onInvoke1 = "dubbo invoke success";
+                break;
+            case "ref-2":
+                this.onInvoke2 = "dubbo invoke success(2)";
+                break;
+            }
         } catch (Exception e) {
-            this.onInvoke = e.toString();
+            switch (RpcContext.getContext().getConsumerUrl().getParameter("refId")) {
+            case "ref-1":
+                this.onInvoke1 = e.toString();
+                break;
+            case "ref-2":
+                this.onInvoke2 = e.toString();
+                break;
+            }
             throw e;
         }
     }
@@ -60,10 +85,32 @@ public class MethodCallbackImpl implements MethodCallback {
         try {
             checkInjection();
             checkTranscation();
-            this.onReturn = "dubbo return success";
+            switch (RpcContext.getContext().getConsumerUrl().getParameter("refId")) {
+            case "ref-1":
+                this.onReturn1 = "dubbo return success";
+                if (cnt1.incrementAndGet() == 2) {
+                    this.onReturn1 = "double 1!";
+                }
+                break;
+            case "ref-2":
+                this.onReturn2 = "dubbo return success(2)";
+                if (cnt2.incrementAndGet() == 2) {
+                    this.onReturn2 = "double 2!";
+                }
+                break;
+            }
         } catch (Exception e) {
-            this.onReturn = e.toString();
+            switch (RpcContext.getContext().getConsumerUrl().getParameter("refId")) {
+            case "ref-1":
+                this.onReturn1 = e.toString();
+                break;
+            case "ref-2":
+                this.onReturn2 = e.toString();
+                break;
+            }
             throw e;
+        } finally {
+            cnt.incrementAndGet();
         }
     }
 
@@ -73,23 +120,37 @@ public class MethodCallbackImpl implements MethodCallback {
         try {
             checkInjection();
             checkTranscation();
-            this.onThrow = "dubbo throw exception";
+            switch (RpcContext.getContext().getConsumerUrl().getParameter("refId")) {
+            case "ref-1":
+                this.onThrow1 = "dubbo throw exception";
+                break;
+            case "ref-2":
+                this.onThrow2 = "dubbo throw exception(2)";
+                break;
+            }
         } catch (Exception e) {
-            this.onThrow = e.toString();
+            switch (RpcContext.getContext().getConsumerUrl().getParameter("refId")) {
+            case "ref-1":
+                this.onThrow1 = e.toString();
+                break;
+            case "ref-2":
+                this.onThrow2 = e.toString();
+                break;
+            }
             throw e;
         }
     }
 
     public String getOnInvoke() {
-        return this.onInvoke;
+        return this.onInvoke1 + ',' + this.onInvoke2;
     }
 
     public String getOnReturn() {
-        return this.onReturn;
+        return this.onReturn1 + ',' + this.onReturn2;
     }
 
     public String getOnThrow() {
-        return this.onThrow;
+        return this.onThrow1 + ',' + this.onThrow2;
     }
 
     private void checkInjection() {

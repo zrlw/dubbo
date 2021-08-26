@@ -60,19 +60,44 @@ public class MethodConfigCallbackTest {
     @Autowired
     private ConfigurableApplicationContext context;
 
-    @DubboReference(check = false,
+    @DubboReference(check = false, async = true,
+            parameters = { "refId", "ref-1" },
             methods = {@Method(name = "sayHello",
                     oninvoke = "methodCallback.oninvoke",
                     onreturn = "methodCallback.onreturn",
                     onthrow = "methodCallback.onthrow")})
     private HelloService helloServiceMethodCallBack;
 
+    @DubboReference(check = false, async = true,
+            parameters = { "refId", "ref-2" },
+            methods = {@Method(name = "sayHello",
+                    oninvoke = "methodCallback.oninvoke",
+                    onreturn = "methodCallback.onreturn",
+                    onthrow = "methodCallback.onthrow")})
+    private HelloService helloServiceMethodCallBack2;
+
     @Test
     public void testMethodAnnotationCallBack() {
-        helloServiceMethodCallBack.sayHello("dubbo");
+        // the reason of creating new thread for each call: 
+        // rpcContext that is still using in callback process will be override at following invoke in the same thread.  
+        new Thread(() -> {
+            helloServiceMethodCallBack.sayHello("dubbo");
+        }).start();
+        new Thread(() -> {
+            helloServiceMethodCallBack2.sayHello("dubbo(2)");
+        }).start();
+        int i = 0;
+        while (MethodCallbackImpl.cnt.get() < 2 && i < 50){
+            // wait for async callback finished
+            try {
+                i++;
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+        }
         MethodCallback notify = (MethodCallback) context.getBean("methodCallback");
-        Assertions.assertEquals("dubbo invoke success", notify.getOnInvoke());
-        Assertions.assertEquals("dubbo return success", notify.getOnReturn());
+        Assertions.assertEquals("dubbo invoke success,dubbo invoke success(2)", notify.getOnInvoke());
+        Assertions.assertEquals("dubbo return success,dubbo return success(2)", notify.getOnReturn());
     }
 
     @Configuration
