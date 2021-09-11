@@ -43,6 +43,7 @@ import org.mockito.Mockito;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.dubbo.common.constants.CommonConstants.ANYHOST_KEY;
 import static org.apache.dubbo.common.constants.CommonConstants.APPLICATION_KEY;
@@ -220,7 +221,7 @@ public class ServiceConfigTest {
         });
         delayService.export();
         assertTrue(delayService.getExportedUrls().isEmpty());
-        latch.await();
+        latch.await(30, TimeUnit.SECONDS);
     }
 
     @Test

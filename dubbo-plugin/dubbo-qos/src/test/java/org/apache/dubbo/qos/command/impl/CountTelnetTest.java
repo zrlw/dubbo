@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -82,7 +83,7 @@ public class CountTelnetTest {
         RpcStatus.beginCount(url, methodName);
         RpcStatus.endCount(url, methodName, 10L, true);
         count.execute(mockCommandContext, args);
-        latch.await();
+        latch.await(30, TimeUnit.SECONDS);
 
         StringBuilder sb = new StringBuilder();
         for (Object o : mockChannel.getReceivedObjects()) {

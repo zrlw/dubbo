@@ -31,6 +31,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.dubbo.common.constants.CommonConstants.CORE_THREADS_KEY;
 import static org.apache.dubbo.common.constants.CommonConstants.QUEUES_KEY;
@@ -68,7 +69,7 @@ public class LimitedThreadPoolTest {
             }
         });
 
-        latch.await();
+        latch.await(30, TimeUnit.SECONDS);
         assertThat(latch.getCount(), is(0L));
     }
 

@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.apache.dubbo.registry.Constants.CONSUMER_PROTOCOL;
@@ -169,7 +170,7 @@ public class FailbackRegistryTest {
         Assertions.assertEquals(1, mockRegistry.getRegistered().size());
         Assertions.assertEquals(1, mockRegistry.getSubscribed().size());
         mockRegistry.recover();
-        countDownLatch.await();
+        countDownLatch.await(30, TimeUnit.SECONDS);
         Assertions.assertEquals(0, mockRegistry.getFailedRegistered().size());
         FailbackRegistry.Holder h = new FailbackRegistry.Holder(registryUrl, listener);
         Assertions.assertNull(mockRegistry.getFailedSubscribed().get(h));

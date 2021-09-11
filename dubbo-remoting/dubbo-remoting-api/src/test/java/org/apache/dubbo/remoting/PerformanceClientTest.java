@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -154,7 +155,7 @@ public class PerformanceClientTest  {
             }
         }).start();
 
-        latch.await();
+        latch.await(30, TimeUnit.SECONDS);
 
         for (ExchangeClient client : exchangeClients) {
             if (client.isConnected()) {

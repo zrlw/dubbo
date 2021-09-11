@@ -143,7 +143,7 @@ public class InternalThreadLocalTest {
             }
         });
         t2.start();
-        countDownLatch.await();
+        countDownLatch.await(30, TimeUnit.SECONDS);
     }
 
     /**

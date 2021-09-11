@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -89,7 +90,7 @@ public class NacosDynamicConfigurationTest {
         put("testapp", "new value3");
         Thread.sleep(5000);
 
-        latch.await();
+        latch.await(30, TimeUnit.SECONDS);
 
         Assertions.assertEquals(1, listener1.getCount("AService.configurators"));
         Assertions.assertEquals(1, listener2.getCount("AService.configurators"));

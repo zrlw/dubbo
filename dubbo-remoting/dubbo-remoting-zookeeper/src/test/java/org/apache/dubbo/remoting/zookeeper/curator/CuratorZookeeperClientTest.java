@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -88,7 +89,7 @@ public class CuratorZookeeperClientTest {
             }
         });
         curatorClient.createPersistent(path + "/provider1");
-        countDownLatch.await();
+        countDownLatch.await(30, TimeUnit.SECONDS);
     }
 
 

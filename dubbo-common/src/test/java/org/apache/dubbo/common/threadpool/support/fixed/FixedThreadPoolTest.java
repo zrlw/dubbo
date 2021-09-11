@@ -70,7 +70,7 @@ public class FixedThreadPoolTest {
             }
         });
 
-        latch.await();
+        latch.await(30, TimeUnit.SECONDS);
         assertThat(latch.getCount(), is(0L));
     }
 

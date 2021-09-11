@@ -146,7 +146,7 @@ public class HashedWheelTimerTest {
                 () -> timer.newTimeout(new EmptyTask(), 5, null));
 
         Timeout timeout = timer.newTimeout(new ErrorTask(), 10, TimeUnit.MILLISECONDS);
-        errorTaskCountDownLatch.await();
+        errorTaskCountDownLatch.await(30, TimeUnit.SECONDS);
         Assertions.assertFalse(timeout.cancel());
         Assertions.assertFalse(timeout.isCancelled());
         Assertions.assertNotNull(timeout.toString());
@@ -181,7 +181,7 @@ public class HashedWheelTimerTest {
     public void stopTaskTest() throws InterruptedException {
         Timer timer = new HashedWheelTimer(new NamedThreadFactory("dubbo-future-timeout", true));
         timer.newTimeout(new TryStopTask(timer), 10, TimeUnit.MILLISECONDS);
-        tryStopTaskCountDownLatch.await();
+        tryStopTaskCountDownLatch.await(30, TimeUnit.SECONDS);
 
         for (int i = 0; i < 8; i++) {
             timer.newTimeout(new EmptyTask(), 0, TimeUnit.SECONDS);

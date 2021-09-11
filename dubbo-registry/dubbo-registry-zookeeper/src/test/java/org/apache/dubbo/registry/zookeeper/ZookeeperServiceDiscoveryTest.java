@@ -37,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Arrays.asList;
 import static org.apache.dubbo.common.utils.NetUtils.getAvailablePort;
@@ -142,7 +143,7 @@ public class ZookeeperServiceDiscoveryTest {
         discovery.register(createServiceInstance(SERVICE_NAME, LOCALHOST, 8082));
         discovery.update(createServiceInstance(SERVICE_NAME, LOCALHOST, 8082));
 
-        latch.await();
+        latch.await(30, TimeUnit.SECONDS);
 
         assertFalse(serviceInstances.isEmpty());
 

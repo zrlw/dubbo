@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -121,7 +122,7 @@ public class ZookeeperDynamicConfigurationTest {
 
         Thread.sleep(5000);
 
-        latch.await();
+        latch.await(30, TimeUnit.SECONDS);
         Assertions.assertEquals(2, listener1.getCount("service:version:group.configurators"));
         Assertions.assertEquals(2, listener2.getCount("service:version:group.configurators"));
         Assertions.assertEquals(2, listener3.getCount("appname.tag-router"));

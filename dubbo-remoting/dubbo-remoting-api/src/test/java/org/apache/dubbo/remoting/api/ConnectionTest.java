@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 class ConnectionTest {
 
@@ -32,7 +33,7 @@ class ConnectionTest {
         CountDownLatch latch = new CountDownLatch(1);
         connection.getClosePromise().addListener(future -> latch.countDown());
         connection.release();
-        latch.await();
+        latch.await(30, TimeUnit.SECONDS);
         Assertions.assertEquals(0, latch.getCount());
     }
 
@@ -53,7 +54,7 @@ class ConnectionTest {
         connection.retain();
         connection.getClosePromise().addListener(future -> latch.countDown());
         connection.release(2);
-        latch.await();
+        latch.await(30, TimeUnit.SECONDS);
         Assertions.assertEquals(0, latch.getCount());
     }
 

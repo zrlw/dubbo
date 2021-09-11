@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -150,6 +151,6 @@ public class ZookeeperRegistryTest {
         zookeeperRegistry.register(serviceUrl);
         zookeeperRegistry.subscribe(anyUrl, urls -> latch.countDown());
         zookeeperRegistry.register(serviceUrl);
-        latch.await();
+        latch.await(30, TimeUnit.SECONDS);
     }
 }

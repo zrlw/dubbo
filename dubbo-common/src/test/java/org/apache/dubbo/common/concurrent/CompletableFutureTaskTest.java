@@ -48,7 +48,7 @@ public class CompletableFutureTaskTest {
             countDownLatch.countDown();
             return true;
         }, executor);
-        countDownLatch.await();
+        countDownLatch.await(30, TimeUnit.SECONDS);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class CompletableFutureTaskTest {
         }, executor);
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         completableFuture.thenRunAsync(countDownLatch::countDown);
-        countDownLatch.await();
+        countDownLatch.await(30, TimeUnit.SECONDS);
     }
 
 

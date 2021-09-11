@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -72,7 +73,7 @@ public class ActiveLimitFilterTest {
 
                 public void run() {
                     try {
-                        latch.await();
+                        latch.await(30, TimeUnit.SECONDS);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -116,7 +117,7 @@ public class ActiveLimitFilterTest {
                 public void run() {
                     try {
                         try {
-                            latch.await();
+                            latch.await(30, TimeUnit.SECONDS);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -139,7 +140,7 @@ public class ActiveLimitFilterTest {
         latch.countDown();
 
         try {
-            latchBlocking.await();
+            latchBlocking.await(30, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -163,7 +164,7 @@ public class ActiveLimitFilterTest {
                 public void run() {
                     try {
                         try {
-                            latch.await();
+                            latch.await(30, TimeUnit.SECONDS);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -187,7 +188,7 @@ public class ActiveLimitFilterTest {
         latch.countDown();
 
         try {
-            latchBlocking.await();
+            latchBlocking.await(30, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

@@ -37,6 +37,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class HeartbeatHandlerTest {
 
@@ -81,7 +82,7 @@ public class HeartbeatHandlerTest {
         serverURL = serverURL.addParameter(Constants.RECONNECT_KEY, false);
 
         client = Exchangers.connect(serverURL);
-        disconnect.await();
+        disconnect.await(30, TimeUnit.SECONDS);
         Assertions.assertTrue(handler.disconnectCount > 0);
         System.out.println("disconnect count " + handler.disconnectCount);
     }
@@ -99,7 +100,7 @@ public class HeartbeatHandlerTest {
         System.out.println("Server bind successfully");
 
         client = Exchangers.connect(serverURL);
-        connect.await();
+        connect.await(30, TimeUnit.SECONDS);
         System.err.println("++++++++++++++ disconnect count " + handler.disconnectCount);
         System.err.println("++++++++++++++ connect count " + handler.connectCount);
         Assertions.assertEquals(0, handler.disconnectCount);
@@ -121,7 +122,7 @@ public class HeartbeatHandlerTest {
         FakeChannelHandlers.resetChannelHandlers();
         serverURL = serverURL.addParameter(Constants.HEARTBEAT_KEY, 1000);
         client = Exchangers.connect(serverURL);
-        connect.await();
+        connect.await(30, TimeUnit.SECONDS);
         Assertions.assertTrue(handler.connectCount > 0);
         System.out.println("connect count " + handler.connectCount);
     }
