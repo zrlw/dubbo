@@ -191,6 +191,8 @@ public final class DubboBootstrap {
 
     private Module currentModule;
 
+    private static MetadataReportInstance metadataReportInstance;
+
     /**
      * See {@link ApplicationModel} and {@link ExtensionLoader} for why DubboBootstrap is designed to be singleton.
      */
@@ -801,7 +803,7 @@ public final class DubboBootstrap {
             return;
         }
 
-        MetadataReportInstance metadataReportInstance = applicationModel.getBeanFactory().getBean(MetadataReportInstance.class);
+        metadataReportInstance = applicationModel.getBeanFactory().getBean(MetadataReportInstance.class);
         for (MetadataReportConfig metadataReportConfig : metadataReportConfigs) {
             ConfigValidationUtils.validateMetadataConfig(metadataReportConfig);
             if (!metadataReportConfig.isValid()) {
@@ -1742,7 +1744,9 @@ public final class DubboBootstrap {
 
     private void destroyMetadataReports() {
         AbstractMetadataReportFactory.destroy();
-        MetadataReportInstance.reset();
+        if (metadataReportInstance != null) {
+            metadataReportInstance.resetInstance();
+        }
     }
 
     private void destroyDynamicConfigurations() {

@@ -18,6 +18,8 @@ package org.apache.dubbo.metadata.report;
 
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.URLBuilder;
+import org.apache.dubbo.common.logger.Logger;
+import org.apache.dubbo.common.logger.LoggerFactory;
 import org.apache.dubbo.config.MetadataReportConfig;
 import org.apache.dubbo.rpc.model.ApplicationModel;
 
@@ -35,14 +37,20 @@ import static org.apache.dubbo.metadata.report.support.Constants.METADATA_REPORT
  */
 public class MetadataReportInstance {
 
+    private static final Logger logger = LoggerFactory.getLogger(MetadataReportInstance.class);
+
+    protected volatile boolean forbidden = false;
+
     private AtomicBoolean init = new AtomicBoolean(false);
 
-    private final Map<String, MetadataReport> metadataReports = new HashMap<>();
+    private volatile Map<String, MetadataReport> metadataReports = new HashMap<>();
 
     public void init(MetadataReportConfig config) {
         if (init.get()) {
             return;
         }
+        forbidden = false;
+        Map<String, MetadataReport> localMetadataReports = metadataReports; // local reference
         ApplicationModel applicationModel = config.getApplicationModel();
 
         MetadataReportFactory metadataReportFactory = applicationModel.getExtensionLoader(MetadataReportFactory.class).getAdaptiveExtension();
@@ -61,7 +69,7 @@ public class MetadataReportInstance {
 //                .orElseThrow(() -> new IllegalStateException("Registry id " + relatedRegistryId + " does not exist."));
         MetadataReport metadataReport = metadataReportFactory.getMetadataReport(url);
         if (metadataReport != null) {
-            metadataReports.put(relatedRegistryId, metadataReport);
+            localMetadataReports.put(relatedRegistryId, metadataReport);
         }
         init.set(true);
     }
@@ -75,15 +83,19 @@ public class MetadataReportInstance {
 
     public MetadataReport getMetadataReport(String registryKey) {
         checkInit();
-        MetadataReport metadataReport = metadataReports.get(registryKey);
+        Map<String, MetadataReport> localMetadataReports = metadataReports; // local reference
+        MetadataReport metadataReport = localMetadataReports.get(registryKey);        
         if (metadataReport == null) {
-            metadataReport = metadataReports.values().iterator().next();
+            metadataReport = localMetadataReports.values().iterator().next();
         }
         return metadataReport;
     }
 
 
     private void checkInit() {
+        if (forbidden) {
+            throw new IllegalStateException("the metadata report was reset.");
+        }
         if (!init.get()) {
             throw new IllegalStateException("the metadata report was not initialized.");
         }
@@ -92,5 +104,26 @@ public class MetadataReportInstance {
     public static void reset() {
 //        metadataReports.clear();
 //        init.set(false);
+    }
+
+    public void resetInstance() {
+        if (!init.get()) {
+            return;
+        }
+        try {
+            forbidden = true;
+            Map<String, MetadataReport> localMetadataReports = metadataReports; // local reference
+            metadataReports = new HashMap<>();
+            localMetadataReports.entrySet().forEach(metadataReportEntry -> {
+                try {
+                    metadataReportEntry.getValue().destroy();
+                } catch (Exception e) {
+                    logger.warn("destroy metadata report failure, relatedRegistryId: " + metadataReportEntry.getKey(), e);
+                }
+            });            
+        } catch (Exception e1) {
+            logger.warn("reset metadata report instance failure.", e1);
+        }
+        init.set(false);        
     }
 }
