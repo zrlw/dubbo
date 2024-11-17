@@ -79,6 +79,7 @@
     <module>dubbo-rpc</module>
     <module>dubbo-cluster</module>
     <module>dubbo-registry</module>
+    <module>dubbo-configcenter</module>
     <module>dubbo-config</module>
     <module>dubbo-plugin</module>
     <module>dubbo-serialization</module>
