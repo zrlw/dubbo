@@ -15,26 +15,36 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.dubbo</groupId>
-    <artifactId>dubbo-parent</artifactId>
+    <artifactId>dubbo-demo-spring-boot-idl</artifactId>
     <version>${revision}</version>
-    <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>dubbo-demo</artifactId>
-  <packaging>pom</packaging>
-  <name>${project.artifactId}</name>
-  <description>The demo module of dubbo project</description>
 
-  <modules>
-    <module>dubbo-demo-api</module>
-    <module>dubbo-demo-spring-boot-idl</module>
-    <module>dubbo-demo-spring-boot</module>
-  </modules>
+  <artifactId>dubbo-demo-spring-boot-idl-consumer</artifactId>
 
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skip_maven_deploy>true</skip_maven_deploy>
   </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.dubbo</groupId>
+        <artifactId>dubbo-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

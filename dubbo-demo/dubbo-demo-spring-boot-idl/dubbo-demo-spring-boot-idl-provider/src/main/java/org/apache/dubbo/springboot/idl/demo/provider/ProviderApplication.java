@@ -14,29 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dubbo.demo.provider;
+package org.apache.dubbo.springboot.idl.demo.provider;
 
-import org.apache.dubbo.api.demo.DemoService;
-import org.apache.dubbo.rpc.RpcContext;
+import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-public class DemoServiceImpl implements DemoService {
-    private static final Logger logger = LoggerFactory.getLogger(DemoServiceImpl.class);
-
-    @Override
-    public String sayHello(String name) {
-        logger.info("Hello " + name + ", request from consumer: "
-                + RpcContext.getServiceContext().getRemoteAddress());
-        return "Hello " + name + ", response from provider: "
-                + RpcContext.getServiceContext().getLocalAddress();
-    }
-
-    @Override
-    public CompletableFuture<String> sayHelloAsync(String name) {
-        return null;
+@SpringBootApplication
+@EnableDubbo
+public class ProviderApplication {
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(ProviderApplication.class, args);
+        System.out.println("dubbo service started");
+        new CountDownLatch(1).await();
     }
 }

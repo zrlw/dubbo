@@ -14,29 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dubbo.demo.provider;
-
-import org.apache.dubbo.api.demo.DemoService;
-import org.apache.dubbo.rpc.RpcContext;
+package org.apache.dubbo.api.demo;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public interface DemoService {
 
-public class DemoServiceImpl implements DemoService {
-    private static final Logger logger = LoggerFactory.getLogger(DemoServiceImpl.class);
+    String sayHello(String name);
 
-    @Override
-    public String sayHello(String name) {
-        logger.info("Hello " + name + ", request from consumer: "
-                + RpcContext.getServiceContext().getRemoteAddress());
-        return "Hello " + name + ", response from provider: "
-                + RpcContext.getServiceContext().getLocalAddress();
-    }
-
-    @Override
-    public CompletableFuture<String> sayHelloAsync(String name) {
-        return null;
+    default CompletableFuture<String> sayHelloAsync(String name) {
+        return CompletableFuture.completedFuture(sayHello(name));
     }
 }
