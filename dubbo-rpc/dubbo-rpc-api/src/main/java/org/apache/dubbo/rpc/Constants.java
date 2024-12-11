@@ -103,8 +103,6 @@ public interface Constants {
 
     String HTTP3_KEY = "http3";
 
-    String TRIPLE_SERVLET_KEY = "triple.servlet";
-
     String H2_SETTINGS_SUPPORT_NO_LOWER_HEADER_KEY = "dubbo.rpc.tri.support-no-lower-header";
     String H2_SETTINGS_IGNORE_1_0_0_KEY = "dubbo.rpc.tri.ignore-1.0.0-version";
     String H2_SETTINGS_RESOLVE_FALLBACK_TO_DEFAULT_KEY = "dubbo.rpc.tri.resolve-fallback-to-default";
@@ -112,8 +110,11 @@ public interface Constants {
 
     String H2_SETTINGS_JSON_FRAMEWORK_NAME = "dubbo.protocol.triple.rest.json-framework";
     String H2_SETTINGS_DISALLOWED_CONTENT_TYPES = "dubbo.protocol.triple.rest.disallowed-content-types";
+    String H2_SETTINGS_OPENAPI_PREFIX = "dubbo.protocol.triple.rest.openapi";
 
     String H2_SETTINGS_VERBOSE_ENABLED = "dubbo.protocol.triple.verbose";
+    String H2_SETTINGS_REST_ENABLED = "dubbo.protocol.triple.rest.enabled";
+    String H2_SETTINGS_OPENAPI_ENABLED = "dubbo.protocol.triple.rest.openapi.enabled";
     String H2_SETTINGS_SERVLET_ENABLED = "dubbo.protocol.triple.servlet.enabled";
     String H3_SETTINGS_HTTP3_ENABLED = "dubbo.protocol.triple.http3.enabled";
     String H3_SETTINGS_HTTP3_NEGOTIATION = "dubbo.protocol.triple.http3.negotiation";

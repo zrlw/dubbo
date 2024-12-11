@@ -106,6 +106,7 @@
     <module>dubbo-plugin/dubbo-filter-validation</module>
     <module>dubbo-plugin/dubbo-rest-jaxrs</module>
     <module>dubbo-plugin/dubbo-rest-spring</module>
+    <module>dubbo-plugin/dubbo-rest-openapi</module>
     <module>dubbo-plugin/dubbo-triple-servlet</module>
     <module>dubbo-plugin/dubbo-triple-websocket</module>
     <module>dubbo-demo/dubbo-demo-api</module>
@@ -160,7 +161,7 @@
     <maven_antrun_version>3.1.0</maven_antrun_version>
     <maven_os_plugin_version>1.7.1</maven_os_plugin_version>
     <maven_protobuf_plugin_version>0.6.1</maven_protobuf_plugin_version>
-    <maven_gmavenplus.version>3.0.2</maven_gmavenplus.version>
+    <maven_gmavenplus_version>3.0.2</maven_gmavenplus_version>
 
     <!-- For unify spring boot 3 version -->
     <spring-6.version>6.2.0</spring-6.version>
@@ -314,6 +315,20 @@
           <artifactId>maven-antrun-plugin</artifactId>
           <version>${maven_antrun_version}</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.dubbo</groupId>
+          <artifactId>dubbo-maven-plugin</artifactId>
+          <version>${project.version}</version>
+          <executions>
+            <execution>
+              <id>generate-stubs</id>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+              <phase>generate-sources</phase>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -379,7 +394,7 @@
       <plugin>
         <groupId>org.codehaus.gmavenplus</groupId>
         <artifactId>gmavenplus-plugin</artifactId>
-        <version>${maven_gmavenplus.version}</version>
+        <version>${maven_gmavenplus_version}</version>
         <configuration>
           <parameters>true</parameters>
         </configuration>

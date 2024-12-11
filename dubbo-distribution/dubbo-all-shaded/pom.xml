@@ -278,6 +278,13 @@
     </dependency>
     <dependency>
       <groupId>org.apache.dubbo</groupId>
+      <artifactId>dubbo-rest-openapi</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.dubbo</groupId>
       <artifactId>dubbo-triple-servlet</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
@@ -524,6 +531,7 @@
                   <include>org.apache.dubbo:dubbo-rpc-triple</include>
                   <include>org.apache.dubbo:dubbo-rest-jaxrs</include>
                   <include>org.apache.dubbo:dubbo-rest-spring</include>
+                  <include>org.apache.dubbo:dubbo-rest-openapi</include>
                   <include>org.apache.dubbo:dubbo-triple-servlet</include>
                   <include>org.apache.dubbo:dubbo-triple-websocket</include>
                   <include>org.apache.dubbo:dubbo-serialization-api</include>
@@ -880,6 +888,9 @@
                 </transformer>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                   <resource>META-INF/dubbo/internal/org.apache.dubbo.rpc.protocol.tri.rest.mapping.RequestMappingResolver</resource>
+                </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/dubbo/internal/org.apache.dubbo.rpc.protocol.tri.rest.openapi.OpenAPIExtension</resource>
                 </transformer>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                   <resource>META-INF/dubbo/internal/org.apache.dubbo.rpc.protocol.tri.route.RequestHandlerMapping</resource>
