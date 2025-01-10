@@ -24,9 +24,9 @@ We are now collecting Dubbo user info to help us to improve Dubbo further. Kindl
 Follow the instructions below to learn how to:
 
 ### Programming with lightweight RPC API
-[5 minutes step-by-step guide](https://cn.dubbo.apache.org/zh-cn/overview/mannual/java-sdk/tasks/develop/api/)
+[5 minutes step-by-step guide]([https://cn.dubbo.apache.org/zh-cn/overview/mannual/java-sdk/tasks/develop/api/](https://cn.dubbo.apache.org/zh-cn/overview/mannual/java-sdk/tasks/framework/lightweight-rpc/))
 
-Dubbo supports building RPC services with only a few lines of code while depending only on a lightweight SDK (<10MB). The protocol on the wire can be [Triple](https://dubbo.apache.org/zh-cn/overview/reference/protocols/triple/)(fully gRPC compatible and HTTP-friendly), Dubbo2(TCP), REST, or any protocol of your choice.
+Dubbo supports building RPC services with only a few lines of code while depending only on a lightweight SDK. The protocol on the wire can be [Triple](https://dubbo.apache.org/zh-cn/overview/reference/protocols/triple/)(fully gRPC compatible and HTTP-friendly), Dubbo2(TCP), REST, or any protocol of your choice.
 
 
 ### Building a microservice application with Spring Boot
