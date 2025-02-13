@@ -30,15 +30,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.apache.dubbo.common.constants.CommonConstants.COMMA_SEPARATOR;
-import static org.apache.dubbo.common.constants.CommonConstants.EXT_PROTOCOL;
-
 public abstract class AbstractPortUnificationServer extends AbstractServer {
 
     /**
      * extension name -> activate WireProtocol
      */
-    private final Map<String, WireProtocol> protocols;
+    private volatile Map<String, WireProtocol> protocols;
 
     /*
     protocol name --> URL object
@@ -55,22 +52,23 @@ public abstract class AbstractPortUnificationServer extends AbstractServer {
 
     public AbstractPortUnificationServer(URL url, ChannelHandler handler) throws RemotingException {
         super(url, handler);
-        ExtensionLoader<WireProtocol> loader = url.getOrDefaultFrameworkModel().getExtensionLoader(WireProtocol.class);
-        Map<String, WireProtocol> protocols = loader.getActivateExtension(url, new String[0]).stream()
-                .collect(Collectors.toConcurrentMap(loader::getExtensionName, Function.identity()));
-        // load extra protocols
-        String extraProtocols = url.getParameter(EXT_PROTOCOL);
-        if (StringUtils.isNotEmpty(extraProtocols)) {
-            Arrays.stream(extraProtocols.split(COMMA_SEPARATOR)).forEach(p -> {
-                protocols.put(p, loader.getExtension(p));
-            });
-        }
-        this.protocols = protocols;
     }
 
     public Map<String, WireProtocol> getProtocols() {
         return protocols;
     }
+
+    @Override
+    protected final void doOpen() {
+        ExtensionLoader<WireProtocol> extensionLoader =
+                getUrl().getOrDefaultFrameworkModel().getExtensionLoader(WireProtocol.class);
+        this.protocols = extensionLoader.getActivateExtension(getUrl(), new String[0]).stream()
+                .collect(Collectors.toConcurrentMap(extensionLoader::getExtensionName, Function.identity()));
+
+        doOpen0();
+    }
+
+    protected abstract void doOpen0();
 
     /*
     This method registers URL object and corresponding channel handler to pu server.
