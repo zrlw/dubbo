@@ -30,6 +30,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.apache.dubbo.common.constants.CommonConstants.COMMA_SEPARATOR;
+import static org.apache.dubbo.common.constants.CommonConstants.EXT_PROTOCOL;
+
 public abstract class AbstractPortUnificationServer extends AbstractServer {
 
     /**
@@ -60,11 +63,18 @@ public abstract class AbstractPortUnificationServer extends AbstractServer {
 
     @Override
     protected final void doOpen() {
-        ExtensionLoader<WireProtocol> extensionLoader =
+        ExtensionLoader<WireProtocol> loader =
                 getUrl().getOrDefaultFrameworkModel().getExtensionLoader(WireProtocol.class);
-        this.protocols = extensionLoader.getActivateExtension(getUrl(), new String[0]).stream()
-                .collect(Collectors.toConcurrentMap(extensionLoader::getExtensionName, Function.identity()));
-
+        Map<String, WireProtocol> protocols = loader.getActivateExtension(getUrl(), new String[0]).stream()
+                .collect(Collectors.toConcurrentMap(loader::getExtensionName, Function.identity()));
+        // load extra protocols
+        String extraProtocols = getUrl().getParameter(EXT_PROTOCOL);
+        if (StringUtils.isNotEmpty(extraProtocols)) {
+            Arrays.stream(extraProtocols.split(COMMA_SEPARATOR)).forEach(p -> {
+                protocols.put(p, loader.getExtension(p));
+            });
+        }
+        this.protocols = protocols;
         doOpen0();
     }
 
