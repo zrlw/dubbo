@@ -25,6 +25,7 @@ import org.apache.dubbo.remoting.RemotingException;
 import org.apache.dubbo.remoting.exchange.ExchangeChannel;
 import org.apache.dubbo.remoting.exchange.ExchangeServer;
 import org.apache.dubbo.remoting.exchange.Exchangers;
+import org.apache.dubbo.remoting.exchange.support.Replier;
 import org.apache.dubbo.remoting.exchange.support.ReplierDispatcher;
 import org.apache.dubbo.rpc.model.ApplicationModel;
 import org.apache.dubbo.rpc.model.ModuleModel;
@@ -64,7 +65,7 @@ class ReplierDispatcherTest {
         port = NetUtils.getAvailablePort();
         ReplierDispatcher dispatcher = new ReplierDispatcher();
         dispatcher.addReplier(RpcMessage.class, new RpcMessageHandler());
-        dispatcher.addReplier(Data.class, (channel, msg) -> new StringMessage("hello world"));
+        dispatcher.addReplier(Data.class, new StringMessageReplier());
         URL url = URL.valueOf(
                 "exchange://localhost:" + port + "?" + CommonConstants.TIMEOUT_KEY + "=60000&threadpool=cached");
         ApplicationModel applicationModel = ApplicationModel.defaultModel();
@@ -177,6 +178,14 @@ class ReplierDispatcherTest {
 
         public String toString() {
             return mText;
+        }
+    }
+
+    static class StringMessageReplier implements Replier<Data> {
+
+        @Override
+        public Object reply(ExchangeChannel channel, Data request) throws RemotingException {
+            return new StringMessage("hello world");
         }
     }
 }

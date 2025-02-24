@@ -182,6 +182,8 @@ jobs:
       MAVEN_SUREFIRE_ADD_OPENS: true
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: "3.3-Optimized-byteCodeWrapper"
       - name: "Set up JDK ${{ matrix.jdk }}"
         uses: actions/setup-java@v4
         with:
