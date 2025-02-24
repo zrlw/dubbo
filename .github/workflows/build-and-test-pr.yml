@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: "3.3"
+          ref: "3.3-Optimized-byteCodeWrapper"
           path: dubbo
       - uses: actions/setup-java@v4
         with:
@@ -137,7 +137,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: "3.3"
+          ref: "3.3-Optimized-byteCodeWrapper"
       - name: "Set up JDK ${{ matrix.jdk }}"
         uses: actions/setup-java@v1
         with:
@@ -423,7 +423,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: "3.3"
+          ref: "3.3-Optimized-byteCodeWrapper"
           path: "./dubbo"
 
       - uses: actions/checkout@v4
