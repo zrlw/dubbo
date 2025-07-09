@@ -48,16 +48,31 @@ public class TriplePingPongHandler extends ChannelDuplexHandler {
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof PingAckEvent) {
+            if (pingAckTimeoutFuture != null) {
+                pingAckTimeoutFuture.cancel(true);
+                pingAckTimeoutFuture = null;
+            }
+            return;
+        }
         if (!(evt instanceof IdleStateEvent)) {
             ctx.fireUserEventTriggered(evt);
             return;
         }
-        ctx.writeAndFlush(new DefaultHttp2PingFrame(0));
         if (pingAckTimeoutFuture == null) {
             pingAckTimeoutFuture =
                     ctx.executor().schedule(new CloseChannelTask(ctx), pingAckTimeout, TimeUnit.MILLISECONDS);
         }
-        // not null means last ping ack not received
+        // pingAckTimeoutFuture not null means last ping ack not received
+        ctx.writeAndFlush(new DefaultHttp2PingFrame(0));
+    }
+
+    public static class PingAckEvent {
+
+        @SuppressWarnings("InstantiationOfUtilityClass")
+        public static final PingAckEvent INSTANCE = new PingAckEvent();
+
+        private PingAckEvent() {}
     }
 
     private static class CloseChannelTask implements Runnable {

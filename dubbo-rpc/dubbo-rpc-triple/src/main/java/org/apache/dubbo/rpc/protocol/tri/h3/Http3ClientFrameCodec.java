@@ -23,6 +23,7 @@ import org.apache.dubbo.remoting.http3.netty4.Constants;
 import org.apache.dubbo.remoting.http3.netty4.Http2HeadersAdapter;
 import org.apache.dubbo.remoting.http3.netty4.Http3HeadersAdapter;
 import org.apache.dubbo.rpc.protocol.tri.TripleHeaderEnum;
+import org.apache.dubbo.rpc.protocol.tri.TriplePingPongHandler.PingAckEvent;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelDuplexHandler;
@@ -30,12 +31,10 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http2.DefaultHttp2DataFrame;
 import io.netty.handler.codec.http2.DefaultHttp2GoAwayFrame;
 import io.netty.handler.codec.http2.DefaultHttp2HeadersFrame;
-import io.netty.handler.codec.http2.DefaultHttp2PingFrame;
 import io.netty.handler.codec.http2.DefaultHttp2ResetFrame;
 import io.netty.handler.codec.http2.Http2DataFrame;
 import io.netty.handler.codec.http2.Http2Headers.PseudoHeaderName;
@@ -83,9 +82,7 @@ public class Http3ClientFrameCodec extends ChannelDuplexHandler {
     }
 
     private void pingAck(ChannelHandlerContext ctx) {
-        ChannelPipeline pipeline = ctx.channel().parent().pipeline();
-        pipeline.fireChannelRead(new DefaultHttp2PingFrame(0, true));
-        pipeline.fireChannelReadComplete();
+        ctx.channel().parent().pipeline().fireUserEventTriggered(PingAckEvent.INSTANCE);
     }
 
     @Override
