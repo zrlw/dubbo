@@ -33,6 +33,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.apache.dubbo.common.constants.CommonConstants.TIMESTAMP_KEY;
 import static org.apache.dubbo.registry.client.metadata.ServiceInstanceMetadataUtils.ENDPOINTS;
 import static org.apache.dubbo.registry.client.metadata.ServiceInstanceMetadataUtils.EXPORTED_SERVICES_REVISION_PROPERTY_NAME;
 
@@ -304,34 +305,86 @@ public class DefaultServiceInstance implements ServiceInstance {
         if (!(o instanceof DefaultServiceInstance)) {
             return false;
         }
-        DefaultServiceInstance that = (DefaultServiceInstance) o;
-        boolean equals = Objects.equals(getServiceName(), that.getServiceName())
-                && Objects.equals(getHost(), that.getHost())
-                && Objects.equals(getPort(), that.getPort());
-        for (Map.Entry<String, String> entry : this.getMetadata().entrySet()) {
-            if (entry.getKey().equals(EXPORTED_SERVICES_REVISION_PROPERTY_NAME)) {
-                continue;
-            }
-            if (entry.getValue() == null) {
-                equals = equals && (entry.getValue() == that.getMetadata().get(entry.getKey()));
-            } else {
-                equals = equals && entry.getValue().equals(that.getMetadata().get(entry.getKey()));
-            }
+        DefaultServiceInstance other = (DefaultServiceInstance) o;
+        if (!Objects.equals(serviceName, other.serviceName)
+                || !Objects.equals(host, other.host)
+                || !Objects.equals(port, other.port)) {
+            return false;
         }
 
-        return equals;
+        return compareMetadata(other.metadata);
     }
 
+    /**
+     * Compares this instance's metadata with other instance's metadata for equality.
+     * <p>
+     * The comparison is performed refer to the {@code equals} method of {@code AbstractMap}. For each entry key:
+     * <ul>
+     *   <li>if the key is EXPORTED_SERVICES_REVISION_PROPERTY_NAME or TIMESTAMP_KEY,
+     *       only the presence of the key is checked; their values are ignored.</li>
+     *   <li>For all other keys, both the key and its value must match.</li>
+     * </ul>
+     * <p>
+     * @param otherMetadata the other instance's metadata to compare with
+     * @return {@code true} if the metadata are considered equal according to the above rules; {@code false} otherwise
+     */
+    private boolean compareMetadata(Map<String, String> otherMetadata) {
+        if (otherMetadata == this.metadata) {
+            return true;
+        }
+
+        if (otherMetadata.size() != this.metadata.size()) {
+            return false;
+        }
+
+        for (Map.Entry<String, String> entry : this.metadata.entrySet()) {
+            String key = entry.getKey();
+            if (key.equals(EXPORTED_SERVICES_REVISION_PROPERTY_NAME) || key.equals(TIMESTAMP_KEY)) {
+                if (!otherMetadata.containsKey(key)) {
+                    return false;
+                }
+            } else {
+                String value = entry.getValue();
+                if (value == null) {
+                    if (otherMetadata.get(key) != null || !otherMetadata.containsKey(key)) {
+                        return false;
+                    }
+                } else {
+                    if (!value.equals(otherMetadata.get(key))) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Calculates the hash code based on this instance's serviceName, host, port and metadata.
+     * The calculation of metadata hash code is performed refer to the {@code hashCode} method of {@code AbstractMap}.
+     * For each entry key:
+     * <ul>
+     *   <li>if the key is EXPORTED_SERVICES_REVISION_PROPERTY_NAME or TIMESTAMP_KEY,
+     *       its entry hash code is ignored.</li>
+     *   <li>For all other keys, its entry hash code will be added to the result.</li>
+     * </ul>
+     * @return this instance's hash code
+     */
     @Override
     public int hashCode() {
-        int result = Objects.hash(getServiceName(), getHost(), getPort());
-        for (Map.Entry<String, String> entry : this.getMetadata().entrySet()) {
-            if (entry.getKey().equals(EXPORTED_SERVICES_REVISION_PROPERTY_NAME)) {
+        int result = Objects.hash(serviceName, host, port);
+
+        // Calculates metadata hashcode regardless of the map entry order.
+        int h = 0;
+        for (Map.Entry<String, String> entry : this.metadata.entrySet()) {
+            String key = entry.getKey();
+            if (key.equals(EXPORTED_SERVICES_REVISION_PROPERTY_NAME) || key.equals(TIMESTAMP_KEY)) {
                 continue;
             }
-            result = 31 * result
-                    + (entry.getValue() == null ? 0 : entry.getValue().hashCode());
+            h += entry.hashCode();
         }
+        result = 31 * result + h;
         return result;
     }
 
