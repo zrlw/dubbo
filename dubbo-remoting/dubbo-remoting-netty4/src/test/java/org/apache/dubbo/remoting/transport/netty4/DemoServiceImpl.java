@@ -26,7 +26,7 @@ public class DemoServiceImpl implements DemoService {
     private static final Logger logger = LoggerFactory.getLogger(DemoServiceImpl.class);
 
     public void sayHello(String name) {
-        logger.info("hello " + name);
+        logger.info("hello {}", name);
     }
 
     public int plus(int a, int b) {
