@@ -811,6 +811,8 @@
       </build>
     </profile>
 
+    <!-- does not set maven.compiler.release to avoid `Unsafe` compilation ERROR at jdk9+ -->
+
     <profile>
       <id>jdk9-jdk11-spotless</id>
       <activation>
