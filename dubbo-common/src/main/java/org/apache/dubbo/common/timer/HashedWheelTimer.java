@@ -316,8 +316,7 @@ public class HashedWheelTimer implements Timer {
         }
 
         if (duration < MILLISECOND_NANOS) {
-            logger.warn(COMMON_UNEXPECTED_EXCEPTION, "", "", "Configured tickDuration {} smaller than {}, using 1ms.",
-                    tickDuration, MILLISECOND_NANOS);
+            logger.warn(COMMON_UNEXPECTED_EXCEPTION, "", "", "Configured tickDuration " + tickDuration + " smaller than " + MILLISECOND_NANOS + ", using 1ms.");
             this.tickDuration = MILLISECOND_NANOS;
         } else {
             this.tickDuration = duration;
