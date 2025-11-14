@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -99,7 +100,11 @@ class DubboMcpSseTransportProviderTest {
         transportProvider.handleRequest(responseObserver);
 
         verify(httpRequest, times(1)).method();
-        verify(responseObserver, times(1)).onNext(any(ServerSentEvent.class));
+        ArgumentCaptor<ServerSentEvent> captor = ArgumentCaptor.forClass(ServerSentEvent.class);
+        verify(responseObserver, times(1)).onNext(captor.capture());
+        ServerSentEvent evt = captor.getValue();
+        Assertions.assertEquals("endpoint", evt.getEvent());
+        Assertions.assertTrue(((String) evt.getData()).startsWith("/mcp/message?sessionId="));
     }
 
     @Test
