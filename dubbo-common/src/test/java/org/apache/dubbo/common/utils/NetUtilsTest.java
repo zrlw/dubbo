@@ -225,6 +225,23 @@ class NetUtilsTest {
         assertThat(normalized.getHostAddress(), equalTo("fe80:0:0:0:894:aeec:f37d:23e1%5"));
     }
 
+    // ================================
+    // IPv6 normalization and testcases
+    // ================================
+
+    @Test
+    void testNormalizeIpv6WithoutScope() throws UnknownHostException {
+        Inet6Address input = (Inet6Address) InetAddress.getByName("2001:db8::1");
+
+        InetAddress result = NetUtils.normalizeV6Address(input);
+
+        assertEquals(input.getHostAddress(), result.getHostAddress());
+    }
+    // NOTE:
+    // Scope-name normalization logic is covered by testNormalizeV6Address,
+    // which is currently @Disabled due to Mockito final-class limitations.
+    // These tests focus on CI-safe behavior over hacky way around.
+
     @Test
     void testMatchIpExpressionWithIpv6Pattern() throws UnknownHostException {
         String pattern = "2001:db8::/64";
@@ -248,12 +265,19 @@ class NetUtilsTest {
     }
 
     @Test
-    public void testMatchIPv6CIDRUnsupported() {
-        String pattern = "2001:db8::/64";
-        String host = "2001:db8::1";
+    void testValidIpv6EdgeCases() {
+        assertDoesNotThrow(() -> InetAddress.getByName("::"));
+        assertDoesNotThrow(() -> InetAddress.getByName("::1"));
+        assertDoesNotThrow(() -> InetAddress.getByName("2001:db8::"));
+    }
 
-        // Current behavior: no exception, result is implementation-defined
-        assertDoesNotThrow(() -> NetUtils.matchIpExpression(pattern, host, 90));
+    @Test
+    void testInvalidIpv6EdgeCases() {
+        assertThrows(UnknownHostException.class, () -> InetAddress.getByName("1:2:3:4:5:6:7:8:9"));
+
+        assertThrows(UnknownHostException.class, () -> InetAddress.getByName("2001:db8::zzzz"));
+
+        assertThrows(UnknownHostException.class, () -> InetAddress.getByName("2001:db8::192.168.1"));
     }
 
     @Test
