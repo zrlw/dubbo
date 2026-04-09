@@ -16,8 +16,6 @@
  */
 package org.apache.dubbo.remoting.transport.netty4;
 
-import io.netty.handler.codec.quic.QuicSslContext;
-
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.remoting.ChannelHandler;
 import org.apache.dubbo.remoting.Constants;
@@ -40,6 +38,7 @@ import io.netty.handler.codec.http3.Http3;
 import io.netty.handler.codec.http3.Http3ClientConnectionHandler;
 import io.netty.handler.codec.quic.QuicChannel;
 import io.netty.handler.codec.quic.QuicChannelBootstrap;
+import io.netty.handler.codec.quic.QuicSslContext;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
