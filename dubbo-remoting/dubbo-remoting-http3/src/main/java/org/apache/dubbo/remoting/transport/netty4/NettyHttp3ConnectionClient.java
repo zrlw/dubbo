@@ -16,6 +16,8 @@
  */
 package org.apache.dubbo.remoting.transport.netty4;
 
+import io.netty.handler.codec.quic.QuicSslContext;
+
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.remoting.ChannelHandler;
 import org.apache.dubbo.remoting.Constants;
@@ -64,8 +66,10 @@ public final class NettyHttp3ConnectionClient extends AbstractNettyConnectionCli
 
     @Override
     protected void initBootstrap() throws Exception {
+        URL url = getUrl();
+        QuicSslContext quicSslContext = Http3SslContexts.buildClientSslContext(url);
         io.netty.channel.ChannelHandler codec = Http3Helper.configCodec(Http3.newQuicClientCodecBuilder(), getUrl())
-                .sslContext(Http3SslContexts.buildClientSslContext(getUrl()))
+                .sslEngineProvider(q -> quicSslContext.newEngine(q.alloc(), url.getHost(), url.getPort()))
                 .build();
         io.netty.channel.Channel nettyDatagramChannel = new Bootstrap()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, getConnectTimeout())
