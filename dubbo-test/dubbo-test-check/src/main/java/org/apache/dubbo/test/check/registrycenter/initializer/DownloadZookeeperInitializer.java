@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -66,12 +67,12 @@ public class DownloadZookeeperInitializer extends ZookeeperInitializer {
     /**
      * The timeout when download zookeeper binary archive file.
      */
-    private static final int REQUEST_TIMEOUT = 180 * 1000;
+    private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(180);
 
     /**
      * The timeout when connect the download url.
      */
-    private static final int CONNECT_TIMEOUT = 60 * 1000;
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(60);
 
     /**
      * Returns {@code true} if the file exists with the given file path, otherwise {@code false}.
@@ -204,7 +205,7 @@ public class DownloadZookeeperInitializer extends ZookeeperInitializer {
                     }
                 });
         // Future timeout should 2 times as equal as REQUEST_TIMEOUT, because it will retry 1 time.
-        Response response = responseFuture.get(REQUEST_TIMEOUT * 2, TimeUnit.MILLISECONDS);
+        Response response = responseFuture.get(REQUEST_TIMEOUT.getSeconds() * 2, TimeUnit.SECONDS);
         Files.copy(response.getResponseBodyAsStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
     }
 }
