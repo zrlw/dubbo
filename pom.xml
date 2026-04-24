@@ -168,6 +168,9 @@
     <spring-security-6.version>6.5.9</spring-security-6.version>
     <spring-boot-3.version>3.5.12</spring-boot-3.version>
 
+    <!-- For unify spring boot 4 version (Spring Framework 7 / Java 17+) -->
+    <spring-boot-4.version>4.0.0</spring-boot-4.version>
+
     <!-- protobuf-java_version should be same as protobuf-java_version at dubbo-dependencies-bom -->
     <protobuf-java_version>4.33.4</protobuf-java_version>
     <!-- grpc_version should be same as grpc.version at dubbo-dependencies-bom -->
@@ -498,6 +501,8 @@
       </activation>
       <modules>
         <module>dubbo-spring-boot-project/dubbo-spring-boot-3-autoconfigure</module>
+        <module>dubbo-spring-boot-project/dubbo-spring-boot-4-autoconfigure</module>
+        <module>dubbo-spring-boot-project/dubbo-spring-boot-starters/dubbo-spring-boot-4-starter</module>
         <module>dubbo-plugin/dubbo-spring6-security</module>
         <module>dubbo-plugin/dubbo-mutiny</module>
       </modules>
@@ -649,6 +654,8 @@
       <id>release</id>
       <modules>
         <module>dubbo-spring-boot-project/dubbo-spring-boot-3-autoconfigure</module>
+        <module>dubbo-spring-boot-project/dubbo-spring-boot-4-autoconfigure</module>
+        <module>dubbo-spring-boot-project/dubbo-spring-boot-starters/dubbo-spring-boot-4-starter</module>
         <module>dubbo-plugin/dubbo-spring6-security</module>
         <module>dubbo-plugin/dubbo-plugin-loom</module>
         <module>dubbo-plugin/dubbo-mutiny</module>
