@@ -37,6 +37,22 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <!-- Override vulnerable Tomcat 10.1.52 from Spring Boot 3 BOM -->
+      <dependency>
+        <groupId>org.apache.tomcat.embed</groupId>
+        <artifactId>tomcat-embed-core</artifactId>
+        <version>10.1.54</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tomcat.embed</groupId>
+        <artifactId>tomcat-embed-el</artifactId>
+        <version>10.1.54</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tomcat.embed</groupId>
+        <artifactId>tomcat-embed-websocket</artifactId>
+        <version>10.1.54</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
