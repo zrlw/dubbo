@@ -39,7 +39,9 @@ public class DubboSpringBoot4DependencyCheckAutoConfiguration {
             "org.apache.dubbo.spring.boot.autoconfigure.DubboTriple4AutoConfiguration";
 
     private static final String SPRING_BOOT_4_DEPENDENCY_CHECK_WARNING =
-            "Couldn't enable servlet support for triple at SpringBoot4: Missing dubbo-spring-boot-4-autoconfigure";
+            "Cannot enable Triple protocol servlet/websocket support on Spring Boot 4: "
+                    + "Missing dubbo-spring-boot-4-autoconfigure dependency. "
+                    + "Please add dubbo-spring-boot-4-starter to your project.";
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(name = JAKARTA_SERVLET_FILTER)

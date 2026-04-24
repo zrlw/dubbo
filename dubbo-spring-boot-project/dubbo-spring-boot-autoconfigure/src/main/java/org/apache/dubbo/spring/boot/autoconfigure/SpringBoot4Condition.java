@@ -23,7 +23,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 
 public class SpringBoot4Condition implements Condition {
 
-    public static boolean IS_SPRING_BOOT_4 = SpringBootVersion.getVersion().charAt(0) >= '4';
+    public static boolean IS_SPRING_BOOT_4 = SpringBootVersion.getVersion().charAt(0) == '4';
 
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
