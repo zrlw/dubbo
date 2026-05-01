@@ -79,6 +79,44 @@ Explore more through our hands-on tasks:
 | **3.2.16**         | 1.8 – 17    | [View Dependencies](https://github.com/apache/dubbo/blob/dubbo-3.2.5/dubbo-dependencies-bom/pom.xml#L94)  | ✅ Actively Maintained <br> ✅ Metrics & Tracing <br> ✅ Thread Pool Isolation <br> ✅ +30% Performance <br> ✅ Native Image Support |
 | **3.1.11**         | 1.8 – 17    | [View Dependencies](https://github.com/apache/dubbo/blob/dubbo-3.2.11/dubbo-dependencies-bom/pom.xml#L90) | ⚠️ Stable, but Not Actively Maintained                                                                         |
 
+## 🌱 Spring Boot Compatibility
+
+| Dubbo Version | Spring Boot 1.x | Spring Boot 2.x | Spring Boot 3.x | Spring Boot 4.x |
+|---------------|:--------------:|:--------------:|:--------------:|:--------------:|
+| 3.3.x         | ✅ (via `dubbo-spring-boot-autoconfigure`) | ✅ (via `dubbo-spring-boot-autoconfigure`) | ✅ (via `dubbo-spring-boot-starter` + `dubbo-spring-boot-3-autoconfigure`) | ✅ (via `dubbo-spring-boot-4-starter`) |
+
+### Using Dubbo with Spring Boot 3.x
+
+```xml
+<dependency>
+  <groupId>org.apache.dubbo</groupId>
+  <artifactId>dubbo-spring-boot-starter</artifactId>
+  <version>${dubbo.version}</version>
+</dependency>
+<!-- Required for Triple servlet/websocket support on Spring Boot 3 -->
+<dependency>
+  <groupId>org.apache.dubbo</groupId>
+  <artifactId>dubbo-spring-boot-3-autoconfigure</artifactId>
+  <version>${dubbo.version}</version>
+</dependency>
+```
+
+### Using Dubbo with Spring Boot 4.x
+
+Spring Boot 4 support requires **Java 17+** and is based on Spring Framework 7 with Jakarta EE namespaces.
+Use the dedicated `dubbo-spring-boot-4-starter` which bundles the Boot-4-specific autoconfiguration:
+
+```xml
+<dependency>
+  <groupId>org.apache.dubbo</groupId>
+  <artifactId>dubbo-spring-boot-4-starter</artifactId>
+  <version>${dubbo.version}</version>
+</dependency>
+```
+
+> **Note:** Do not include `dubbo-spring-boot-3-autoconfigure` when using Spring Boot 4;
+> use `dubbo-spring-boot-4-autoconfigure` (pulled in transitively by `dubbo-spring-boot-4-starter`) instead.
+
 ### Dubbo2
 
 | Version     | JDK       | Dependencies                                                                                          | Description |

@@ -24,34 +24,39 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>dubbo-spring-boot-3-autoconfigure</artifactId>
+  <artifactId>dubbo-spring-boot-4-autoconfigure</artifactId>
   <packaging>jar</packaging>
-  <description>Apache Dubbo Spring Boot 3 Auto-Configure</description>
+  <description>Apache Dubbo Spring Boot 4 Auto-Configure</description>
+
+  <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+  </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>${spring-boot-3.version}</version>
+        <version>${spring-boot-4.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <!-- Override vulnerable Tomcat 10.1.52 from Spring Boot 3 BOM -->
+      <!-- Override vulnerable Tomcat 11.0.14 from Spring Boot 4 BOM -->
       <dependency>
         <groupId>org.apache.tomcat.embed</groupId>
         <artifactId>tomcat-embed-core</artifactId>
-        <version>10.1.54</version>
+        <version>11.0.21</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tomcat.embed</groupId>
         <artifactId>tomcat-embed-el</artifactId>
-        <version>10.1.54</version>
+        <version>11.0.21</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tomcat.embed</groupId>
         <artifactId>tomcat-embed-websocket</artifactId>
-        <version>10.1.54</version>
+        <version>11.0.21</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -107,6 +112,13 @@
       <groupId>jakarta.websocket</groupId>
       <artifactId>jakarta.websocket-client-api</artifactId>
       <scope>provided</scope>
+    </dependency>
+
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
