@@ -88,7 +88,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
             expireSeconds = 60;
         }
         sessions = new ExpiringMap<>(expireSeconds, 30);
-        this.mcpJsonMapper = mcpJsonMapper;
+        this.mcpJsonMapper = java.util.Objects.requireNonNull(mcpJsonMapper, "mcpJsonMapper must not be null");
         sessions.getExpireThread().startExpiryIfNotStarted();
     }
 
