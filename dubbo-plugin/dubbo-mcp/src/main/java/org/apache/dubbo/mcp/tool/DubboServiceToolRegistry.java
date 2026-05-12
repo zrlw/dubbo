@@ -376,8 +376,9 @@ public class DubboServiceToolRegistry {
 
         generateSchemaFromMethodSignature(method, properties, requiredParams);
 
+        List<String> schemaRequiredParams = requiredParams.isEmpty() ? null : requiredParams;
         return new McpSchema.JsonSchema(
-                JsonSchemaType.OBJECT_SCHEMA.getJsonSchemaType(), properties, requiredParams, null, null, null);
+                JsonSchemaType.OBJECT_SCHEMA.getJsonSchemaType(), properties, schemaRequiredParams, null, null, null);
     }
 
     private void generateSchemaFromMethodSignature(
