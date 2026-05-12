@@ -56,6 +56,9 @@ public class McpApplicationDeployListener implements ApplicationDeployListener {
 
     private static final ErrorTypeAwareLogger logger =
             LoggerFactory.getErrorTypeAwareLogger(McpApplicationDeployListener.class);
+
+    private static final McpJsonMapper MCP_JSON_MAPPER = createMcpJsonMapper();
+
     private DubboServiceToolRegistry toolRegistry;
 
     private boolean mcpEnable = true;
@@ -106,15 +109,14 @@ public class McpApplicationDeployListener implements ApplicationDeployListener {
 
             Integer sessionTimeout =
                     globalConf.getInt(McpConstant.SETTINGS_MCP_SESSION_TIMEOUT, McpConstant.DEFAULT_SESSION_TIMEOUT);
-            McpJsonMapper mcpJsonMapper = new JacksonMcpJsonMapper(new ObjectMapper());
             if ("streamable".equals(protocol)) {
                 dubboMcpStreamableTransportProvider =
-                        new DubboMcpStreamableTransportProvider(mcpJsonMapper, sessionTimeout);
+                        new DubboMcpStreamableTransportProvider(MCP_JSON_MAPPER, sessionTimeout);
                 mcpAsyncServer = McpServer.async(getDubboMcpStreamableTransportProvider())
                         .capabilities(serverCapabilities)
                         .build();
             } else if ("sse".equals(protocol)) {
-                dubboMcpSseTransportProvider = new DubboMcpSseTransportProvider(mcpJsonMapper, sessionTimeout);
+                dubboMcpSseTransportProvider = new DubboMcpSseTransportProvider(MCP_JSON_MAPPER, sessionTimeout);
                 mcpAsyncServer = McpServer.async(getDubboMcpSseTransportProvider())
                         .capabilities(serverCapabilities)
                         .build();
@@ -247,5 +249,11 @@ public class McpApplicationDeployListener implements ApplicationDeployListener {
             }
         }
         return NetUtils.getAvailablePort();
+    }
+
+    private static McpJsonMapper createMcpJsonMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL);
+        return new JacksonMcpJsonMapper(objectMapper);
     }
 }

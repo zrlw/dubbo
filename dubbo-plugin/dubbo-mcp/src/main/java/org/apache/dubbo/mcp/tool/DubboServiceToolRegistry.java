@@ -379,7 +379,7 @@ public class DubboServiceToolRegistry {
         return new McpSchema.JsonSchema(
                 JsonSchemaType.OBJECT_SCHEMA.getJsonSchemaType(),
                 properties,
-                requiredParams.isEmpty() ? null : requiredParams,
+                requiredParams,
                 null,
                 null,
                 null);

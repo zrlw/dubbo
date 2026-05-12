@@ -63,7 +63,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
 
     private Factory sessionFactory;
 
-    private final McpJsonMapper objectMapper;
+    private final McpJsonMapper mcpJsonMapper;
 
     public static final String SESSION_ID_HEADER = "mcp-session-id";
 
@@ -88,7 +88,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
             expireSeconds = 60;
         }
         sessions = new ExpiringMap<>(expireSeconds, 30);
-        this.objectMapper = objectMapper;
+        this.mcpJsonMapper = objectMapper;
         sessions.getExpireThread().startExpiryIfNotStarted();
     }
 
@@ -208,7 +208,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
                                 message -> {
                                     if (responseObserver != null) {
                                         try {
-                                            String jsonData = objectMapper.writeValueAsString(message);
+                                            String jsonData = mcpJsonMapper.writeValueAsString(message);
                                             responseObserver.onNext(ServerSentEvent.<byte[]>builder()
                                                     .event("message")
                                                     .data(jsonData.getBytes(StandardCharsets.UTF_8))
@@ -296,7 +296,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
 
             // Read and deserialize JSON-RPC message from request body
             String requestBody = IOUtils.read(request.inputStream(), StandardCharsets.UTF_8.name());
-            McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(objectMapper, requestBody);
+            McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(mcpJsonMapper, requestBody);
 
             // Check if it's an initialization request
             if (message instanceof McpSchema.JSONRPCRequest
@@ -318,7 +318,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
                 }
 
                 // Create new session
-                McpSchema.InitializeRequest initializeRequest = objectMapper.convertValue(
+                McpSchema.InitializeRequest initializeRequest = mcpJsonMapper.convertValue(
                         ((McpSchema.JSONRPCRequest) message).params(), McpSchema.InitializeRequest.class);
 
                 McpStreamableServerSession.McpStreamableServerSessionInit init =
@@ -333,7 +333,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
                     response.setHeader(SESSION_ID_HEADER, session.getId());
                     response.setStatus(HttpStatus.OK.getCode());
 
-                    String jsonResponse = objectMapper.writeValueAsString(new McpSchema.JSONRPCResponse(
+                    String jsonResponse = mcpJsonMapper.writeValueAsString(new McpSchema.JSONRPCResponse(
                             McpSchema.JSONRPC_VERSION, ((McpSchema.JSONRPCRequest) message).id(), initResult, null));
 
                     if (responseObserver != null) {
@@ -428,7 +428,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
 
                 // Handle request stream
                 DubboMcpSessionTransport sessionTransport =
-                        new DubboMcpSessionTransport(responseObserver, objectMapper);
+                        new DubboMcpSessionTransport(responseObserver, mcpJsonMapper);
                 session.responseStream((McpSchema.JSONRPCRequest) message, sessionTransport)
                         .block();
             } else {
@@ -528,14 +528,14 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
 
     private static class DubboMcpSessionTransport implements McpStreamableServerTransport {
 
-        private final McpJsonMapper JSON;
+        private final McpJsonMapper mcpJsonMapper1;
 
         private final StreamObserver<ServerSentEvent<byte[]>> responseObserver;
 
         public DubboMcpSessionTransport(
                 StreamObserver<ServerSentEvent<byte[]>> responseObserver, McpJsonMapper objectMapper) {
             this.responseObserver = responseObserver;
-            this.JSON = objectMapper;
+            this.mcpJsonMapper1 = objectMapper;
         }
 
         @Override
@@ -555,7 +555,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
             return Mono.fromRunnable(() -> {
                 try {
                     if (responseObserver != null) {
-                        String jsonText = JSON.writeValueAsString(message);
+                        String jsonText = mcpJsonMapper1.writeValueAsString(message);
                         responseObserver.onNext(ServerSentEvent.<byte[]>builder()
                                 .event("message")
                                 .data(jsonText.getBytes(StandardCharsets.UTF_8))
@@ -572,7 +572,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
             return Mono.fromRunnable(() -> {
                 try {
                     if (responseObserver != null) {
-                        String jsonText = JSON.writeValueAsString(message);
+                        String jsonText = mcpJsonMapper1.writeValueAsString(message);
                         ServerSentEvent<byte[]> event = ServerSentEvent.<byte[]>builder()
                                 .event("message")
                                 .data(jsonText.getBytes(StandardCharsets.UTF_8))
@@ -588,7 +588,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
 
         @Override
         public <T> T unmarshalFrom(Object data, TypeRef<T> typeRef) {
-            return JSON.convertValue(data, typeRef);
+            return mcpJsonMapper1.convertValue(data, typeRef);
         }
     }
 }
