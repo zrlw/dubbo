@@ -301,7 +301,8 @@ public class DubboOpenApiToolConverter {
                 }
             });
         }
-        return new McpSchema.JsonSchema(JsonSchemaType.OBJECT_SCHEMA.getJsonSchemaType(), props, null, null, null, null);
+        return new McpSchema.JsonSchema(
+                JsonSchemaType.OBJECT_SCHEMA.getJsonSchemaType(), props, null, null, null, null);
     }
 
     private Map<String, Object> convertOpenApiSchemaToMcpMap(Schema openApiSchema) {
