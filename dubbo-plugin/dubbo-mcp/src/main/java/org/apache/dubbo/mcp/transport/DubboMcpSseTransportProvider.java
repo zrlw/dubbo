@@ -37,8 +37,8 @@ import org.apache.dubbo.rpc.model.ApplicationModel;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.modelcontextprotocol.json.McpJsonMapper;
+import io.modelcontextprotocol.json.TypeRef;
 import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpServerSession;
@@ -66,14 +66,14 @@ public class DubboMcpSseTransportProvider implements McpServerTransportProvider 
 
     private McpServerSession.Factory sessionFactory;
 
-    private final ObjectMapper objectMapper;
+    private final McpJsonMapper objectMapper;
 
     /**
      * session cache, default expire time is 60 seconds
      */
     private final ExpiringMap<String, McpServerSession> sessions;
 
-    public DubboMcpSseTransportProvider(ObjectMapper objectMapper, Integer expireSeconds) {
+    public DubboMcpSseTransportProvider(McpJsonMapper objectMapper, Integer expireSeconds) {
         if (expireSeconds != null) {
             if (expireSeconds < 60) {
                 expireSeconds = 60;
@@ -86,7 +86,7 @@ public class DubboMcpSseTransportProvider implements McpServerTransportProvider 
         sessions.getExpireThread().startExpiryIfNotStarted();
     }
 
-    public DubboMcpSseTransportProvider(ObjectMapper objectMapper) {
+    public DubboMcpSseTransportProvider(McpJsonMapper objectMapper) {
         this(objectMapper, 60);
     }
 
@@ -179,12 +179,12 @@ public class DubboMcpSseTransportProvider implements McpServerTransportProvider 
 
     private static class DubboMcpSessionTransport implements McpServerTransport {
 
-        private final ObjectMapper JSON;
+        private final McpJsonMapper JSON;
 
         private final StreamObserver<ServerSentEvent<String>> responseObserver;
 
         public DubboMcpSessionTransport(
-                StreamObserver<ServerSentEvent<String>> responseObserver, ObjectMapper objectMapper) {
+                StreamObserver<ServerSentEvent<String>> responseObserver, McpJsonMapper objectMapper) {
             this.responseObserver = responseObserver;
             this.JSON = objectMapper;
         }
@@ -215,7 +215,7 @@ public class DubboMcpSseTransportProvider implements McpServerTransportProvider 
         }
 
         @Override
-        public <T> T unmarshalFrom(Object data, TypeReference<T> typeRef) {
+        public <T> T unmarshalFrom(Object data, TypeRef<T> typeRef) {
             return JSON.convertValue(data, typeRef);
         }
     }

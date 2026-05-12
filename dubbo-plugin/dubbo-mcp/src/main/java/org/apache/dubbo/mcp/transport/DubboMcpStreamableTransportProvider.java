@@ -39,8 +39,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.modelcontextprotocol.json.McpJsonMapper;
+import io.modelcontextprotocol.json.TypeRef;
 import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpStreamableServerSession;
@@ -63,7 +63,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
 
     private Factory sessionFactory;
 
-    private final ObjectMapper objectMapper;
+    private final McpJsonMapper objectMapper;
 
     public static final String SESSION_ID_HEADER = "mcp-session-id";
 
@@ -74,11 +74,11 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
      */
     private final ExpiringMap<String, McpStreamableServerSession> sessions;
 
-    public DubboMcpStreamableTransportProvider(ObjectMapper objectMapper) {
+    public DubboMcpStreamableTransportProvider(McpJsonMapper objectMapper) {
         this(objectMapper, McpConstant.DEFAULT_SESSION_TIMEOUT);
     }
 
-    public DubboMcpStreamableTransportProvider(ObjectMapper objectMapper, Integer expireSeconds) {
+    public DubboMcpStreamableTransportProvider(McpJsonMapper objectMapper, Integer expireSeconds) {
         // Minimum expiration time is 60 seconds
         if (expireSeconds != null) {
             if (expireSeconds < 60) {
@@ -319,7 +319,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
 
                 // Create new session
                 McpSchema.InitializeRequest initializeRequest = objectMapper.convertValue(
-                        ((McpSchema.JSONRPCRequest) message).params(), new TypeReference<>() {});
+                        ((McpSchema.JSONRPCRequest) message).params(), McpSchema.InitializeRequest.class);
 
                 McpStreamableServerSession.McpStreamableServerSessionInit init =
                         sessionFactory.startSession(initializeRequest);
@@ -528,12 +528,12 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
 
     private static class DubboMcpSessionTransport implements McpStreamableServerTransport {
 
-        private final ObjectMapper JSON;
+        private final McpJsonMapper JSON;
 
         private final StreamObserver<ServerSentEvent<byte[]>> responseObserver;
 
         public DubboMcpSessionTransport(
-                StreamObserver<ServerSentEvent<byte[]>> responseObserver, ObjectMapper objectMapper) {
+                StreamObserver<ServerSentEvent<byte[]>> responseObserver, McpJsonMapper objectMapper) {
             this.responseObserver = responseObserver;
             this.JSON = objectMapper;
         }
@@ -587,7 +587,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
         }
 
         @Override
-        public <T> T unmarshalFrom(Object data, TypeReference<T> typeRef) {
+        public <T> T unmarshalFrom(Object data, TypeRef<T> typeRef) {
             return JSON.convertValue(data, typeRef);
         }
     }
