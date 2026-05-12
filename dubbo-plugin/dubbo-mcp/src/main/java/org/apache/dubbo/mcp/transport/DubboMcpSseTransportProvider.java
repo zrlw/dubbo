@@ -147,7 +147,7 @@ public class DubboMcpSseTransportProvider implements McpServerTransportProvider 
         refreshSessionExpire(session);
         try {
             McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(
-                    mcpJsonMapper, IOUtils.read(request.inputStream(), String.valueOf(StandardCharsets.UTF_8)));
+                    mcpJsonMapper, IOUtils.read(request.inputStream(), StandardCharsets.UTF_8.name()));
             session.handle(message).block();
             response.setStatus(HttpStatus.OK.getCode());
         } catch (IOException e) {
