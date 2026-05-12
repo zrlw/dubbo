@@ -74,11 +74,11 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
      */
     private final ExpiringMap<String, McpStreamableServerSession> sessions;
 
-    public DubboMcpStreamableTransportProvider(McpJsonMapper objectMapper) {
-        this(objectMapper, McpConstant.DEFAULT_SESSION_TIMEOUT);
+    public DubboMcpStreamableTransportProvider(McpJsonMapper mcpJsonMapper) {
+        this(mcpJsonMapper, McpConstant.DEFAULT_SESSION_TIMEOUT);
     }
 
-    public DubboMcpStreamableTransportProvider(McpJsonMapper objectMapper, Integer expireSeconds) {
+    public DubboMcpStreamableTransportProvider(McpJsonMapper mcpJsonMapper, Integer expireSeconds) {
         // Minimum expiration time is 60 seconds
         if (expireSeconds != null) {
             if (expireSeconds < 60) {
@@ -88,7 +88,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
             expireSeconds = 60;
         }
         sessions = new ExpiringMap<>(expireSeconds, 30);
-        this.mcpJsonMapper = objectMapper;
+        this.mcpJsonMapper = mcpJsonMapper;
         sessions.getExpireThread().startExpiryIfNotStarted();
     }
 
@@ -528,14 +528,14 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
 
     private static class DubboMcpSessionTransport implements McpStreamableServerTransport {
 
-        private final McpJsonMapper mcpJsonMapper1;
+        private final McpJsonMapper mcpJsonMapper;
 
         private final StreamObserver<ServerSentEvent<byte[]>> responseObserver;
 
         public DubboMcpSessionTransport(
-                StreamObserver<ServerSentEvent<byte[]>> responseObserver, McpJsonMapper objectMapper) {
+                StreamObserver<ServerSentEvent<byte[]>> responseObserver, McpJsonMapper mcpJsonMapper) {
             this.responseObserver = responseObserver;
-            this.mcpJsonMapper1 = objectMapper;
+            this.mcpJsonMapper = mcpJsonMapper;
         }
 
         @Override
@@ -555,7 +555,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
             return Mono.fromRunnable(() -> {
                 try {
                     if (responseObserver != null) {
-                        String jsonText = mcpJsonMapper1.writeValueAsString(message);
+                        String jsonText = mcpJsonMapper.writeValueAsString(message);
                         responseObserver.onNext(ServerSentEvent.<byte[]>builder()
                                 .event("message")
                                 .data(jsonText.getBytes(StandardCharsets.UTF_8))
@@ -572,7 +572,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
             return Mono.fromRunnable(() -> {
                 try {
                     if (responseObserver != null) {
-                        String jsonText = mcpJsonMapper1.writeValueAsString(message);
+                        String jsonText = mcpJsonMapper.writeValueAsString(message);
                         ServerSentEvent<byte[]> event = ServerSentEvent.<byte[]>builder()
                                 .event("message")
                                 .data(jsonText.getBytes(StandardCharsets.UTF_8))
@@ -588,7 +588,7 @@ public class DubboMcpStreamableTransportProvider implements McpStreamableServerT
 
         @Override
         public <T> T unmarshalFrom(Object data, TypeRef<T> typeRef) {
-            return mcpJsonMapper1.convertValue(data, typeRef);
+            return mcpJsonMapper.convertValue(data, typeRef);
         }
     }
 }
