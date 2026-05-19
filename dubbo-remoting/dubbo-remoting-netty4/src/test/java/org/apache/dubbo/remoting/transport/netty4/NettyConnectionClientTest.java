@@ -64,19 +64,19 @@ class NettyConnectionClientTest {
         Assertions.assertNotNull(defaultPortAddress);
         Assertions.assertEquals(NettyConnectionClient.DEFAULT_SOCKS_PROXY_PORT, defaultPortAddress.getPort());
 
-        EmbeddedChannel noPortChannel = new EmbeddedChannel();
-        NettyConnectionClient.addSocks5ProxyIfConfigured(noPortChannel.pipeline());
-        Assertions.assertNotNull(noPortChannel.pipeline().get(Socks5ProxyHandler.class));
-        noPortChannel.close();
+        EmbeddedChannel channelWithMissingPort = new EmbeddedChannel();
+        NettyConnectionClient.addSocks5ProxyIfConfigured(channelWithMissingPort.pipeline());
+        Assertions.assertNotNull(channelWithMissingPort.pipeline().get(Socks5ProxyHandler.class));
+        channelWithMissingPort.close();
 
         System.setProperty(NettyConnectionClient.SOCKS_PROXY_PORT, "invalid");
         InetSocketAddress invalidPortAddress = NettyConnectionClient.getSocks5ProxyAddress();
         Assertions.assertNotNull(invalidPortAddress);
         Assertions.assertEquals(NettyConnectionClient.DEFAULT_SOCKS_PROXY_PORT, invalidPortAddress.getPort());
 
-        EmbeddedChannel invalidPortChannel = new EmbeddedChannel();
-        NettyConnectionClient.addSocks5ProxyIfConfigured(invalidPortChannel.pipeline());
-        Assertions.assertNotNull(invalidPortChannel.pipeline().get(Socks5ProxyHandler.class));
-        invalidPortChannel.close();
+        EmbeddedChannel channelWithInvalidPort = new EmbeddedChannel();
+        NettyConnectionClient.addSocks5ProxyIfConfigured(channelWithInvalidPort.pipeline());
+        Assertions.assertNotNull(channelWithInvalidPort.pipeline().get(Socks5ProxyHandler.class));
+        channelWithInvalidPort.close();
     }
 }
