@@ -19,6 +19,7 @@ package org.apache.dubbo.remoting.transport.netty4;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.Version;
 import org.apache.dubbo.common.utils.NetUtils;
+import org.apache.dubbo.common.utils.StringUtils;
 import org.apache.dubbo.remoting.ChannelHandler;
 import org.apache.dubbo.remoting.Constants;
 import org.apache.dubbo.remoting.RemotingException;
@@ -28,6 +29,7 @@ import org.apache.dubbo.remoting.transport.netty4.ssl.SslClientTlsHandler;
 import org.apache.dubbo.remoting.transport.netty4.ssl.SslContexts;
 import org.apache.dubbo.remoting.utils.UrlUtils;
 
+import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -40,6 +42,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http2.Http2FrameCodec;
+import io.netty.handler.proxy.Socks5ProxyHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultPromise;
@@ -51,6 +54,12 @@ import static org.apache.dubbo.common.constants.LoggerCodeConstants.TRANSPORT_CL
 import static org.apache.dubbo.remoting.transport.netty4.NettyEventLoopFactory.socketChannelClass;
 
 public final class NettyConnectionClient extends AbstractNettyConnectionClient {
+
+    static final String SOCKS_PROXY_HOST = "socksProxyHost";
+
+    static final String SOCKS_PROXY_PORT = "socksProxyPort";
+
+    static final int DEFAULT_SOCKS_PROXY_PORT = 1080;
 
     private Bootstrap bootstrap;
 
@@ -124,7 +133,7 @@ public final class NettyConnectionClient extends AbstractNettyConnectionClient {
 
                 // set null but do not close this client, it will be reconnecting in the future
                 ch.closeFuture().addListener(channelFuture -> clearNettyChannel());
-                // TODO support Socks5
+                addSocks5ProxyIfConfigured(pipeline);
 
                 // set channel initialized promise to success if necessary.
                 Promise<Void> channelInitializedPromise = channelInitializedPromiseRef.get();
@@ -226,5 +235,36 @@ public final class NettyConnectionClient extends AbstractNettyConnectionClient {
 
             throw remotingException;
         }
+    }
+
+    static void addSocks5ProxyIfConfigured(ChannelPipeline pipeline) {
+        InetSocketAddress socksProxyAddress = getSocks5ProxyAddress();
+        if (socksProxyAddress == null) {
+            return;
+        }
+        pipeline.addFirst(new Socks5ProxyHandler(socksProxyAddress));
+    }
+
+    static InetSocketAddress getSocks5ProxyAddress() {
+        String host = System.getProperty(SOCKS_PROXY_HOST);
+        if (StringUtils.isBlank(host)) {
+            return null;
+        }
+        return new InetSocketAddress(host, parseSocks5ProxyPort(System.getProperty(SOCKS_PROXY_PORT)));
+    }
+
+    static int parseSocks5ProxyPort(String port) {
+        if (StringUtils.isBlank(port)) {
+            return DEFAULT_SOCKS_PROXY_PORT;
+        }
+        try {
+            int socksProxyPort = Integer.parseInt(port);
+            if (socksProxyPort > 0 && socksProxyPort <= 65535) {
+                return socksProxyPort;
+            }
+        } catch (NumberFormatException ignored) {
+            // ignore invalid configured port
+        }
+        return DEFAULT_SOCKS_PROXY_PORT;
     }
 }
