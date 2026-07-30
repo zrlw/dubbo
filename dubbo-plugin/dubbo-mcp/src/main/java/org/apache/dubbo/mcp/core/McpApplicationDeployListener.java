@@ -44,6 +44,8 @@ import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.modelcontextprotocol.json.McpJsonMapper;
+import io.modelcontextprotocol.json.jackson2.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -104,14 +106,15 @@ public class McpApplicationDeployListener implements ApplicationDeployListener {
 
             Integer sessionTimeout =
                     globalConf.getInt(McpConstant.SETTINGS_MCP_SESSION_TIMEOUT, McpConstant.DEFAULT_SESSION_TIMEOUT);
+            McpJsonMapper mcpJsonMapper = new JacksonMcpJsonMapper(new ObjectMapper());
             if ("streamable".equals(protocol)) {
                 dubboMcpStreamableTransportProvider =
-                        new DubboMcpStreamableTransportProvider(new ObjectMapper(), sessionTimeout);
+                        new DubboMcpStreamableTransportProvider(mcpJsonMapper, sessionTimeout);
                 mcpAsyncServer = McpServer.async(getDubboMcpStreamableTransportProvider())
                         .capabilities(serverCapabilities)
                         .build();
             } else if ("sse".equals(protocol)) {
-                dubboMcpSseTransportProvider = new DubboMcpSseTransportProvider(new ObjectMapper(), sessionTimeout);
+                dubboMcpSseTransportProvider = new DubboMcpSseTransportProvider(mcpJsonMapper, sessionTimeout);
                 mcpAsyncServer = McpServer.async(getDubboMcpSseTransportProvider())
                         .capabilities(serverCapabilities)
                         .build();

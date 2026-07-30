@@ -29,6 +29,7 @@ import org.apache.dubbo.rpc.RpcServiceContext;
 import java.io.ByteArrayInputStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.modelcontextprotocol.json.jackson2.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpServerSession;
 import org.junit.jupiter.api.AfterEach;
@@ -87,7 +88,7 @@ class DubboMcpSseTransportProviderTest {
         rpcContextMockedStatic.when(RpcContext::getServiceContext).thenReturn(rpcServiceContext);
         when(rpcServiceContext.getRequest(HttpRequest.class)).thenReturn(httpRequest);
         when(rpcServiceContext.getResponse(HttpResponse.class)).thenReturn(httpResponse);
-        transportProvider = new DubboMcpSseTransportProvider(objectMapper);
+        transportProvider = new DubboMcpSseTransportProvider(new JacksonMcpJsonMapper(objectMapper));
         transportProvider.setSessionFactory(sessionFactory);
     }
 
